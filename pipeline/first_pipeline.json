@@ -1,0 +1,121 @@
+{
+	"name": "first_pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach_4o6",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.cw_items",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy_4o6",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [
+								{
+									"name": "Source",
+									"value": "task.@{item().source.table}"
+								},
+								{
+									"name": "Destination",
+									"value": "task.@{item().destination.table}"
+								}
+							],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"tableOption": "autoCreate"
+								},
+								"enableStaging": false,
+								"validateDataConsistency": false
+							},
+							"inputs": [
+								{
+									"referenceName": "SourceDataset_4o6",
+									"type": "DatasetReference",
+									"parameters": {
+										"cw_table": "@item().source.table"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DestinationDataset_4o6",
+									"type": "DatasetReference",
+									"parameters": {
+										"cw_table": "@item().destination.table"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"cw_items": {
+				"type": "Array",
+				"defaultValue": [
+					{
+						"source": {
+							"table": "Course"
+						},
+						"destination": {
+							"table": "Course"
+						}
+					},
+					{
+						"source": {
+							"table": "SubTask"
+						},
+						"destination": {
+							"table": "SubTask"
+						}
+					},
+					{
+						"source": {
+							"table": "SubTaskLog"
+						},
+						"destination": {
+							"table": "SubTaskLog"
+						}
+					},
+					{
+						"source": {
+							"table": "Task"
+						},
+						"destination": {
+							"table": "Task"
+						}
+					},
+					{
+						"source": {
+							"table": "TaskBackup"
+						},
+						"destination": {
+							"table": "TaskBackup"
+						}
+					}
+				]
+			}
+		},
+		"annotations": []
+	}
+}
