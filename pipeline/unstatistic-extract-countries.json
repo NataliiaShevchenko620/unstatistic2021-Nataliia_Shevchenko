@@ -239,7 +239,15 @@
 					{
 						"activity": "Copy countries to SQL",
 						"dependencyConditions": [
-							"Succeeded"
+							"Succeeded",
+							"Skipped"
+						]
+					},
+					{
+						"activity": "Set variable PipelineExecutionStatus",
+						"dependencyConditions": [
+							"Succeeded",
+							"Skipped"
 						]
 					}
 				],
@@ -287,6 +295,43 @@
 				"linkedServiceName": {
 					"referenceName": "unstatisticsqlnsdevlinkedservice",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Set variable PipelineExecutionDescription",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Copy countries to SQL",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "PipelineExecutionDescription",
+					"value": {
+						"value": "@activity('Copy countries to SQL').output",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set variable PipelineExecutionStatus",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set variable PipelineExecutionDescription",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "PipelineExecutionStatus",
+					"value": "Failed"
 				}
 			}
 		],
