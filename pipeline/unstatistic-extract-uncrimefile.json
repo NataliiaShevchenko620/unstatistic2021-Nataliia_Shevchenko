@@ -798,7 +798,21 @@
 				"inputs": [
 					{
 						"referenceName": "src_csv_uncrime",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"Container": {
+								"value": "@pipeline().parameters.Container",
+								"type": "Expression"
+							},
+							"Path": {
+								"value": "@pipeline().parameters.Path",
+								"type": "Expression"
+							},
+							"FileName": {
+								"value": "@pipeline().parameters.FileName",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
@@ -854,13 +868,6 @@
 							"Succeeded",
 							"Skipped"
 						]
-					},
-					{
-						"activity": "Set variable PipelineExecutionStatus",
-						"dependencyConditions": [
-							"Succeeded",
-							"Skipped"
-						]
 					}
 				],
 				"policy": {
@@ -908,25 +915,22 @@
 					"referenceName": "unstatisticsqlnsdevlinkedservice",
 					"type": "LinkedServiceReference"
 				}
-			},
-			{
-				"name": "Set variable PipelineExecutionStatus",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Copy uncrime to SQL",
-						"dependencyConditions": [
-							"Failed"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "PipelineExecutionStatus",
-					"value": "Failed"
-				}
 			}
 		],
+		"parameters": {
+			"Container": {
+				"type": "string",
+				"defaultValue": "unstatistic-sourcefiles"
+			},
+			"Path": {
+				"type": "string",
+				"defaultValue": "CrimeStat.Source.UNCrime"
+			},
+			"FileName": {
+				"type": "string",
+				"defaultValue": "burglary.csv"
+			}
+		},
 		"variables": {
 			"PipelineExecutionDescription": {
 				"type": "String",
