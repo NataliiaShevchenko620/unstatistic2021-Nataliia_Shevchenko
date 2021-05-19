@@ -865,8 +865,7 @@
 					{
 						"activity": "Copy uncrime to SQL",
 						"dependencyConditions": [
-							"Succeeded",
-							"Skipped"
+							"Succeeded"
 						]
 					}
 				],
