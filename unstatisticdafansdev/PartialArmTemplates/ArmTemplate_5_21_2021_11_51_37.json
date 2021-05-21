@@ -6,748 +6,12 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "unstatisticdafansdev"
-		},
-		"msbiazurelinkedservice_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'msbiazurelinkedservice'"
-		},
-		"unstatisticsqlnsdevlinkedservice_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'unstatisticsqlnsdevlinkedservice'"
-		},
-		"unstatisticstac_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'unstatisticstac'"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/first_pipeline')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ForEach_4o6",
-						"type": "ForEach",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@pipeline().parameters.cw_items",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Copy_4o6",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [
-										{
-											"name": "Source",
-											"value": "task.@{item().source.table}"
-										},
-										{
-											"name": "Destination",
-											"value": "task.@{item().destination.table}"
-										}
-									],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"tableOption": "autoCreate"
-										},
-										"enableStaging": false,
-										"validateDataConsistency": false
-									},
-									"inputs": [
-										{
-											"referenceName": "SourceDataset_4o6",
-											"type": "DatasetReference",
-											"parameters": {
-												"cw_table": "@item().source.table"
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "DestinationDataset_4o6",
-											"type": "DatasetReference",
-											"parameters": {
-												"cw_table": "@item().destination.table"
-											}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"parameters": {
-					"cw_items": {
-						"type": "Array",
-						"defaultValue": [
-							{
-								"source": {
-									"table": "Course"
-								},
-								"destination": {
-									"table": "Course"
-								}
-							},
-							{
-								"source": {
-									"table": "SubTask"
-								},
-								"destination": {
-									"table": "SubTask"
-								}
-							},
-							{
-								"source": {
-									"table": "SubTaskLog"
-								},
-								"destination": {
-									"table": "SubTaskLog"
-								}
-							},
-							{
-								"source": {
-									"table": "Task"
-								},
-								"destination": {
-									"table": "Task"
-								}
-							},
-							{
-								"source": {
-									"table": "TaskBackup"
-								},
-								"destination": {
-									"table": "TaskBackup"
-								}
-							}
-						]
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SourceDataset_4o6')]",
-				"[concat(variables('factoryId'), '/datasets/DestinationDataset_4o6')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DestinationDataset_4o6')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "unstatisticsqlnsdevlinkedservice",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"cw_table": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "task",
-					"table": {
-						"value": "@dataset().cw_table",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticsqlnsdevlinkedservice')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SourceDataset_4o6')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "msbiazurelinkedservice",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"cw_table": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "task",
-					"table": {
-						"value": "@dataset().cw_table",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/msbiazurelinkedservice')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/msbiazurelinkedservice')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('msbiazurelinkedservice_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/unstatisticsqlnsdevlinkedservice')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('unstatisticsqlnsdevlinkedservice_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/unstatistic-extract-countries')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "extract data from CSV file to SQL Database",
-				"activities": [
-					{
-						"name": "Copy countries to SQL",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "SP PipelineExecutionHistory_Create",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"preCopyScript": "TRUNCATE TABLE staging.countriesref_untyped",
-								"disableMetricsCollection": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "name",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "name",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "alpha-2",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "alpha-2",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "alpha-3",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "alpha-3",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "country-code",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "country-code",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "iso_3166-2",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "iso_3166-2",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "region",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "region",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "sub-region",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "sub-region",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "intermediate-region",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "intermediate-region",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "region-code",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "region-code",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "sub-region-code",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "sub-region-code",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "intermediate-region-code",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "intermediate-region-code",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "src_csv_countries",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "dst_sql_countries",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "SP PipelineExecutionHistory_Create",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[adf].[usp_PipelineExecutionHistory_Create]",
-							"storedProcedureParameters": {
-								"PipelineName": {
-									"value": {
-										"value": "@pipeline().Pipeline",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"PipelineRunId": {
-									"value": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "unstatisticsqlnsdevlinkedservice",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "SP PipelineExecutionHistory_Update",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Copy countries to SQL",
-								"dependencyConditions": [
-									"Succeeded",
-									"Skipped"
-								]
-							},
-							{
-								"activity": "Set variable PipelineExecutionStatus",
-								"dependencyConditions": [
-									"Succeeded",
-									"Skipped"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[adf].[usp_PipelineExecutionHistory_Update]",
-							"storedProcedureParameters": {
-								"Description": {
-									"value": {
-										"value": "@variables('PipelineExecutionDescription')",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"PipelineName": {
-									"value": {
-										"value": "@pipeline().Pipeline",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"PipelineRunId": {
-									"value": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"Status": {
-									"value": {
-										"value": "@variables('PipelineExecutionStatus')",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "unstatisticsqlnsdevlinkedservice",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Set variable PipelineExecutionStatus",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Copy countries to SQL",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "PipelineExecutionStatus",
-							"value": "Failed"
-						}
-					}
-				],
-				"variables": {
-					"PipelineExecutionDescription": {
-						"type": "String",
-						"defaultValue": "\"succeed\""
-					},
-					"PipelineExecutionStatus": {
-						"type": "String",
-						"defaultValue": "succeed"
-					}
-				},
-				"folder": {
-					"name": "unstatistic"
-				},
-				"annotations": [
-					"extract"
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/src_csv_countries')]",
-				"[concat(variables('factoryId'), '/datasets/dst_sql_countries')]",
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticsqlnsdevlinkedservice')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/unstatisticstac')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('unstatisticstac_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/src_csv_countries')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "unstatisticstac",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "ISOcountries.csv",
-						"folderPath": "CrimeStat.Source.Countries",
-						"container": "unstatistic-sourcefiles"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticstac')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/dst_sql_countries')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "unstatisticsqlnsdevlinkedservice",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "SourceItemId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "name",
-						"type": "nvarchar"
-					},
-					{
-						"name": "alpha-2",
-						"type": "nvarchar"
-					},
-					{
-						"name": "alpha-3",
-						"type": "nvarchar"
-					},
-					{
-						"name": "country-code",
-						"type": "nvarchar"
-					},
-					{
-						"name": "iso_3166-2",
-						"type": "nvarchar"
-					},
-					{
-						"name": "region",
-						"type": "nvarchar"
-					},
-					{
-						"name": "sub-region",
-						"type": "nvarchar"
-					},
-					{
-						"name": "intermediate-region",
-						"type": "nvarchar"
-					},
-					{
-						"name": "region-code",
-						"type": "nvarchar"
-					},
-					{
-						"name": "sub-region-code",
-						"type": "nvarchar"
-					},
-					{
-						"name": "intermediate-region-code",
-						"type": "nvarchar"
-					},
-					{
-						"name": "sysCreatedAt",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "sysChangedAt",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "sysChangedBy",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "sysCreatedBy",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "staging",
-					"table": "countriesref_untyped"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticsqlnsdevlinkedservice')]"
-			]
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/unstatistic-extract-population')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -1550,15 +814,13 @@
 						"inputs": [
 							{
 								"referenceName": "src_csv_population",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						],
 						"outputs": [
 							{
 								"referenceName": "dst_sql_population",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						]
 					},
@@ -1700,8 +962,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/src_csv_population')]",
-				"[concat(variables('factoryId'), '/datasets/dst_sql_population')]",
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticsqlnsdevlinkedservice')]"
+				"[concat(variables('factoryId'), '/datasets/dst_sql_population')]"
 			]
 		},
 		{
@@ -1978,9 +1239,7 @@
 					}
 				]
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticstac')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dst_sql_population')]",
@@ -2286,9 +1545,7 @@
 					"table": "population_untyped"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticsqlnsdevlinkedservice')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/unstatistic-extract-uncrimefile')]",
@@ -2444,8 +1701,7 @@
 						"outputs": [
 							{
 								"referenceName": "dst_sql_uncrime",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						]
 					},
@@ -2576,8 +1832,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/src_csv_uncrime')]",
-				"[concat(variables('factoryId'), '/datasets/dst_sql_uncrime')]",
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticsqlnsdevlinkedservice')]"
+				"[concat(variables('factoryId'), '/datasets/dst_sql_uncrime')]"
 			]
 		},
 		{
@@ -2628,9 +1883,7 @@
 				},
 				"schema": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticstac')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dst_sql_uncrime')]",
@@ -2701,9 +1954,7 @@
 					"table": "uncrime_untyped"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticsqlnsdevlinkedservice')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/unstatistic-master-extract-uncrimefile')]",
@@ -2826,8 +2077,7 @@
 							},
 							"dataset": {
 								"referenceName": "dst_sql_dummy",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						}
 					},
@@ -2905,8 +2155,7 @@
 							},
 							"dataset": {
 								"referenceName": "dst_sql_dummy",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						}
 					},
@@ -3043,7 +2292,6 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticsqlnsdevlinkedservice')]",
 				"[concat(variables('factoryId'), '/datasets/dst_sql_dummy')]",
 				"[concat(variables('factoryId'), '/datasets/src_csv_uncrime_folder')]",
 				"[concat(variables('factoryId'), '/pipelines/unstatistic-extract-uncrimefile')]"
@@ -3060,12 +2308,9 @@
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
+				"schema": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticsqlnsdevlinkedservice')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/src_csv_uncrime_folder')]",
@@ -3107,9 +2352,7 @@
 				},
 				"schema": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/unstatisticstac')]"
-			]
+			"dependsOn": []
 		}
 	]
 }
