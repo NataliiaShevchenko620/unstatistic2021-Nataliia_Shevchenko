@@ -83,6 +83,10 @@
 							"type": "String"
 						}
 					}
+				},
+				"linkedServiceName": {
+					"referenceName": "unstatisticsqlnsdevlinkedservice",
+					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -215,7 +219,28 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"fieldList": []
+					"dataset": {
+						"referenceName": "src_csv_uncrime_folder",
+						"type": "DatasetReference",
+						"parameters": {
+							"Container": {
+								"value": "@variables('container')",
+								"type": "Expression"
+							},
+							"Path": {
+								"value": "@variables('filepath')",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [],
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
 				}
 			},
 			{
@@ -269,8 +294,16 @@
 								},
 								"waitOnCompletion": true,
 								"parameters": {
-									"filename": {
-										"value": "@{replace(variables('filename'),'.csv','')}",
+									"Container": {
+										"value": "@variables('container')",
+										"type": "Expression"
+									},
+									"Path": {
+										"value": "@variables('filepath')",
+										"type": "Expression"
+									},
+									"FileName": {
+										"value": "@variables('filename')",
 										"type": "Expression"
 									}
 								}
