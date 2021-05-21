@@ -1,5 +1,5 @@
 {
-	"name": "src_csv_uncrime_copy1",
+	"name": "src_csv_uncrime_folder",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "unstatisticstac",
@@ -13,10 +13,6 @@
 			"Path": {
 				"type": "string",
 				"defaultValue": "CrimeStat.Source.UNCrime"
-			},
-			"FileName": {
-				"type": "string",
-				"defaultValue": "burglary.csv"
 			}
 		},
 		"annotations": [],
@@ -24,10 +20,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": {
-					"value": "@dataset().FileName",
-					"type": "Expression"
-				},
 				"folderPath": {
 					"value": "@dataset().Path",
 					"type": "Expression"
